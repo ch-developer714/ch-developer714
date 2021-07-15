@@ -1,0 +1,34 @@
+# Required library
+library(dplyr)
+
+# Load URL and get line numbers
+url <- "https://www.wiche.edu/tuition-savings/wrgp/wrgp-savings-finder/school-details/?schoolID=0011H00001Q1eL1QAJ"
+page <- readLines(url)
+d_line_num <- grep("Doctorate", page)
+m_line_num <- grep("Master's", page)
+line_num <- append(d_line_num, m_line_num)
+line_num <- sort(line_num)
+
+# Extract text
+line_pop <- page[line_num]
+line_pop1 <- gsub("^[[:space:]]+", "", line_pop)
+
+degree_start <- gregexpr("\\(", line_pop1)
+degree_end <- gregexpr(")", line_pop1)
+
+# Pull out major and degree names
+# Note: using "length(degree_start[[i]])" to subset degree_start & degree_end 
+# ensures that majors with an emphasis in paranthesis (ie Electrical Engineering 
+# (Space Studies Concentration)) are able to be included in the major name
+major <- sapply(1:length(line_pop1),
+                function(i) substr(line_pop1[i], 1, degree_start[[i]][length(degree_start[[i]])] - 2))
+
+degree <- sapply(1:length(line_pop1), 
+                 function(i) substr(line_pop1[i], 
+                                    degree_start[i][[1]][length(degree_start[[i]])] + 1, 
+                                    degree_end[i][[1]][length(degree_end[[i]])] - 1))
+
+# Combine major and degree into 1 data frame and export
+df <- data.frame(major, degree) %>%
+  rename(MAJOR = major, DEGREE = degree)
+write.csv(df, file = "approved_degrees.csv", row.names = FALSE)
