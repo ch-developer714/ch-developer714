@@ -4,6 +4,9 @@
 ## TASK 3: R01A, R01B (thru R09Z)
 ## TASK 4: R0A1, R0A2 (thru R0Z9)
 
+# source of help to export to XLSX (username Syed) 
+# https://stackoverflow.com/questions/27713310/easy-way-to-export-multiple-data-frame-to-multiple-excel-worksheets
+
 # required libraries
 library(dplyr)
 library(openxlsx)
