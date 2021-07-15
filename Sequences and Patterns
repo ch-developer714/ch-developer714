@@ -1,0 +1,81 @@
+# GOAL: Create different sets of numbers/letters, as follows:
+## TASK 1: R001, R002 (thru R099)
+## TASK 2: R0AA, R0AB (thru R0ZZ)
+## TASK 3: R01A, R01B (thru R09Z)
+## TASK 4: R0A1, R0A2 (thru R0Z9)
+
+# required libraries
+library(dplyr)
+library(openxlsx)
+
+# options of vectors to be used
+num_options1 <- 1:9
+num_options2 <- c(paste0(0, 1:9), 10:99)
+let_options <- toupper(letters)
+
+##############
+### TASK 1 ###
+##############
+task1 <- sapply(1:99, function(i) paste0("R0", num_options2[i])) %>% 
+  data.frame(.) %>%
+  rename(CODES = ".")
+
+##############
+### TASK 2 ###
+##############
+start_task2 <- sapply(1:26, function(i) paste0("R0", let_options[i]))
+finish_task2 <- sapply(1:26, function(i) paste0(start_task2, let_options[i])) %>%
+  data.frame(.)
+
+task2 <- c()
+for(i in 1:26) {
+  data_column <- finish_task2[i, ] 
+  task2 <- append(task2, data_column)
+}
+
+task2 <- task2 %>%
+  unlist(.) %>%
+  data.frame(.) %>%
+  rename(CODES = ".")
+
+##############
+### TASK 3 ###
+##############
+start_task3 <- sapply(1:9, function(i) paste0("R0", num_options1[i]))
+finish_task3 <- sapply(1:26, function(i) paste0(start_task3, let_options[i])) %>%
+  data.frame(.)
+
+task3 <- c()
+for(i in 1:26) {
+  data_column <- finish_task3[i, ] 
+  task3 <- append(task3, data_column)
+}
+
+task3 <- task3 %>%
+  unlist(.) %>%
+  data.frame(.) %>%
+  rename(CODES = ".")
+
+##############
+### TASK 4 ###
+##############
+start_task4 <- sapply(1:26, function(i) paste0("R0", let_options[i]))
+finish_task4 <- sapply(1:9, function(i) paste0(start_task4, num_options1[i])) %>%
+  data.frame(.)
+
+task4 <- c()
+for(i in 1:26) {
+  data_column <- finish_task4[i, ] 
+  task4 <- append(task4, data_column)
+}
+
+task4 <- task4 %>%
+  unlist(.) %>%
+  data.frame(.) %>%
+  rename(CODES = ".")
+
+######################
+### EXPORT TO XLSX ###
+######################
+sheets <- list("Task 1" = task1, "Task 2" = task2, "Task 3" = task3, "Task 4" = task4)
+write.xlsx(sheets, file = "sequences.xlsx")
