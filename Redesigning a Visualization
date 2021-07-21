@@ -1,0 +1,71 @@
+# Source of visualization to redesign
+# https://abcnews.go.com/US/shark-attacks-told-graphs/story?id=31779076
+# The graphic is titled "Most Shark Attacks Happen in Florida"
+
+# Reasons this graphic can be recreated:
+## 1) The data layout is messy when there are 5 or less shark attacks; it is 
+## difficult to follow the line from data point to data point for each country. 
+## Additionally, if the graph was printed in black and white ink, the graph 
+## would be difficult to read accurately.
+##
+## 2) The y-axis looks fine but the x-axis is minimally done. Determining the 
+## number of attacks in any year besides 2005 or 2014 is difficult unless you 
+## count the number of points individually as you follow the lines (if you are 
+## able to accurately do so). Also, it is unclear which lines individually 
+## belong to California and North Carolina due to them being the same color and 
+## there are different shades of the same colors which makes several regions 
+## difficult to differentiate.
+## 
+## Resource for determining what improvements can be made in the visualization:
+## http://www.wisdom.weizmann.ac.il/~zvika/course2015/announcements/WainerAmericanStatistician1984.pdf
+
+# Required library
+library(ggplot2)
+
+# First, create lists containing years, country names, and point estimates per country
+# Note: lists are being used to easily categorize data for each country
+year <- rep(list(2005:2014), 10)
+country <- list(rep("Australia", 10), 
+                rep("Bahamas", 10),
+                rep("Brazil", 10),
+                rep("California", 10),
+                rep("Florida", 10),
+                rep("Hawaii", 10),
+                rep("North Carolina", 10),
+                rep("Reunion Island", 10),
+                rep("South Africa", 10),
+                rep("South Carolina", 10))
+attack_estimate <- list(c(10, 7, 12, 10, 22, 14, 13, 14, 10, 11),
+                        c(1, 2, 0, 0, 0, 2, 0, 0, 0, 0),
+                        c(1, 3, 0, 3, 1, 1, 4, 2, 1, 0),
+                        c(3, 1, 4, 2, 4, 4, 3, 5, 1, 4),
+                        c(17, 21, 31, 28, 19, 14, 11, 27, 23, 28),
+                        c(4, 3, 7, 1, 3, 4, 3, 10, 13, 7),
+                        c(2, 1, 2, 3, 1, 5, 4, 2, 1, 4),
+                        c(0, 2, 1, 0, 0, 1, 4, 4, 5, 1),
+                        c(4, 4, 2, 0, 6, 8, 5, 4, 5, 2),
+                        c(5, 4, 5, 2, 0, 4, 2, 5, 6, 5))
+
+# Second, use a for-loop to extract data from the lists, one at a time
+df <- data.frame()
+for(i in 1:10) {
+  attack_info <- data.frame(year[[i]], country[[i]], attack_estimate[[i]])
+  df <- rbind(df, attack_info) 
+}
+colnames(df) = c("year", "country", "attack_estimate")
+
+# Lastly, use ggplot() to plot the data found in df 
+ggplot(df, aes(x = year, y = attack_estimate, color = country)) + 
+  geom_point() +
+  facet_wrap(~country, ncol = 2) +
+  labs(title = "Total Shark Attacks by Area (2005-2014)",
+       x = "",
+       y = "") +
+  scale_x_continuous(limits = c(2005, 2014),
+                     breaks = seq(2005, 2014, by = 1)) +
+  scale_y_continuous(limits = c(0, 31), 
+                     breaks = seq(0, 31, by = 10)) +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(hjust = 0.5))
